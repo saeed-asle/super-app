@@ -46,7 +46,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: ./php
-          push: false
+          push: false 
           tags: ${{ env.REGISTRY }}/${{ env.IMAGE_PHP }}:${{ env.IMAGE_TAG }}
 
       # Step 7: Push Node.js Container to Docker Hub
