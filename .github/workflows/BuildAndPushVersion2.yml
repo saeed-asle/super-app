@@ -1,9 +1,9 @@
 name: Build and Push Images version 2
 on:
   push:
-    branches: [ "main" ]
-  workflow_dispatch:
-
+    branches: [main]
+  pull_request:
+    branches: [main]  
 env:
   REGISTRY: docker.io
   IMAGE_NODE: saeedasle/super-app-node
