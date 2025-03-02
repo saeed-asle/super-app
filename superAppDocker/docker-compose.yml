@@ -3,7 +3,7 @@ version: '3.8'
 services:
   node:
     container_name: super-node
-    build: 
+    build:  
       context: ../node
     image: super-app-node
     ports:
