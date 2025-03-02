@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  node:
+    container_name: super-node
+    build: 
+      context: ../node
+    image: super-app-node
+    ports:
+      - "3000:3000"
+    restart: always
+    environment:
+      NODE_ENV: ${NODE_ENV:-production} 
+      DB_HOST: ${DB_HOST}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+    depends_on:
+      - mysql  
+    networks:
+      - frontToBack
+      - backToDB
+
+  php:
+    container_name: super-php
+    build: 
+      context: ../php
+    image: super-app-php
+    ports:
+      - "8080:80"
+    restart: always
+    networks:
+      - frontToBack
+
+  mysql:
+    image: mysql:8.0.28
+    container_name: super-mysql
+    restart: always
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    ports:
+      - "3306:3306"
+    networks:
+      - backToDB
+    volumes:
+      - mySqlDB:/var/lib/mysql
+
+networks:
+  frontToBack:
+  backToDB:
+
+volumes:
+  mySqlDB:
+
