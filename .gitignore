@@ -1,0 +1,8 @@
+.env
+package-lock.json
+yarn.lock
+dist/
+build/
+logs/
+*.log
+superAppDocker/.env
