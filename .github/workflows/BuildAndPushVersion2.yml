@@ -1,70 +1,76 @@
-name: Build and Push Images version 2
+name: Build and Push Docker Images
+
 on:
   push:
     branches: [main]
   pull_request:
     branches: [main]
 
-env:
-  REGISTRY: docker.io
-  IMAGE_NODE: saeedasle/super-app-node
-  IMAGE_PHP: saeedasle/super-app-php
-
 jobs:
+  # Job 1: Checkout Code
   checkout:
     runs-on: ubuntu-latest
     steps:
-      # Step 1: Checkout Code
       - name: Checkout repository
         uses: actions/checkout@v4
 
+  # Job 2: Build Docker Images
   build:
     runs-on: ubuntu-latest
-    needs: checkout
+    needs: checkout  # Ensures this job runs after the 'checkout' job
     steps:
+      # Step 1: Checkout repository (again, in case needed)
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       # Step 2: Set up Docker Buildx
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      # Step 3: Build Node.js Container
+      # Step 3: Build Node.js container
       - name: Build Node.js container
         uses: docker/build-push-action@v5
         with:
           context: ./node
           push: false
-          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NODE }}:${{ github.sha }}
+          tags: saeedasle/super-app-node:${{ github.sha }}
 
-      # Step 4: Build PHP Container
+      # Step 4: Build PHP container
       - name: Build PHP container
         uses: docker/build-push-action@v5
         with:
           context: ./php
-          push: false 
-          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_PHP }}:${{ github.sha }}
+          push: false
+          tags: saeedasle/super-app-php:${{ github.sha }}
 
+  # Job 3: Push Docker Images to Docker Hub
   push:
     runs-on: ubuntu-latest
-    needs: build
+    needs: build  # Ensures this job runs after the 'build' job
     steps:
-      # Step 5: Log into Docker Hub
+      # Step 1: Checkout repository (again, in case needed)
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Step 2: Log into Docker Hub
       - name: Log into Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USER }}
           password: ${{ secrets.DOCKER_PASS }}
 
-      # Step 6: Push Node.js Container to Docker Hub
+      # Step 3: Push Node.js container
       - name: Push Node.js container
         uses: docker/build-push-action@v5
         with:
           context: ./node
           push: true
-          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NODE }}:${{ github.sha }}
+          tags: saeedasle/super-app-node:${{ github.sha }}
 
-      # Step 7: Push PHP Container to Docker Hub
+      # Step 4: Push PHP container
       - name: Push PHP container
         uses: docker/build-push-action@v5
         with:
           context: ./php
           push: true
-          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_PHP }}:${{ github.sha }}
+          tags: saeedasle/super-app-php:${{ github.sha }}
